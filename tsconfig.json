@@ -10,8 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "files": [
-  ],
+  "files": [],
   "references": [
     {
       "path": "./packages/core"
