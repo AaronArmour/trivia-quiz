@@ -20,10 +20,10 @@
       "path": "./packages/utils"
     },
     {
-      "path": "./apps/cli-client"
+      "path": "./apps/server"
     },
     {
-      "path": "./apps/server"
+      "path": "./apps/cli-client"
     },
     {
       "path": "./apps/web-client"
