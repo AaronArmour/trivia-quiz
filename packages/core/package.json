@@ -1,0 +1,12 @@
+{
+  "name": "@quiz-lib/core",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "The package containing core functionality for the quiz library"
+}
