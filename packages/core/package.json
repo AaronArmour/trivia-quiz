@@ -8,5 +8,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "The package containing core functionality for the quiz library"
+  "description": "The package containing core functionality for the quiz library",
+  "dependencies": {
+    "@quiz-lib/utils": "^1.0.0",
+    "axios": "^1.7.7"
+  }
 }

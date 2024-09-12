@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import { generateUniqueId, randomPermutation } from './utils';
-import { Answer, Question, QuestionGrading, Score } from "./types";
-import { QuizPlayer } from "./QuizPlayer";
+import { generateUniqueId, randomPermutation } from '@quiz-lib/utils';
+import { Answer, Question, QuestionGrading, Score } from './types';
+import { QuizPlayer } from './QuizPlayer';
 
 interface IQuiz {
   initQuestions(): Promise<void>;
@@ -45,7 +45,7 @@ export class Quiz implements IQuiz {
     const grading = {
       id: this.qs[this.qIndex].id,
       correct,
-      correctAnswer: this.qs[this.qIndex].correctAnswer
+      correctAnswer: this.qs[this.qIndex].correctAnswer,
     };
 
     this.qIndex++;
@@ -56,7 +56,7 @@ export class Quiz implements IQuiz {
   getScore(): Score {
     return {
       correct: this.correctAnswers,
-      total: this.qs.length
+      total: this.qs.length,
     };
   }
 
@@ -67,35 +67,35 @@ export class Quiz implements IQuiz {
 
 // Eventually shift this to a separate file
 async function getQuestions() {
-  const res = await axios.get('https://the-trivia-api.com/v2/questions?limit=3');
-
-  return res.data.map(
-    (q: any) => {
-      return {
-        id: q.id,
-        question: q.question.text,
-        incorrectAnswers: q.incorrectAnswers,
-        correctAnswer: q.correctAnswer
-      };
-    }
+  const res = await axios.get(
+    'https://the-trivia-api.com/v2/questions?limit=3',
   );
+
+  return res.data.map((q: any) => {
+    return {
+      id: q.id,
+      question: q.question.text,
+      incorrectAnswers: q.incorrectAnswers,
+      correctAnswer: q.correctAnswer,
+    };
+  });
 }
 
 function prepareQuestions(questions: any[]): Question[] {
-  return questions.map(
-    (q) => {
-      const choices = [q.correctAnswer, ...q.incorrectAnswers];
-      const answers = new Array(choices.length);
-      const perm = randomPermutation(choices.length);
-      perm.forEach((p, i) => { answers[p] = `${p}. ${choices[i]}`; });
+  return questions.map((q) => {
+    const choices = [q.correctAnswer, ...q.incorrectAnswers];
+    const answers = new Array(choices.length);
+    const perm = randomPermutation(choices.length);
+    perm.forEach((p, i) => {
+      answers[p] = `${p}. ${choices[i]}`;
+    });
 
-      return {
-        id: q.id,
-        question: q.question,
-        answers: answers,
-        correctAnswer: `${answers[perm[0]]}`,
-        correctResponse: `${perm[0]}`
-      };
-    }
-  );
+    return {
+      id: q.id,
+      question: q.question,
+      answers: answers,
+      correctAnswer: `${answers[perm[0]]}`,
+      correctResponse: `${perm[0]}`,
+    };
+  });
 }
