@@ -1,0 +1,24 @@
+{
+  "name": "trivia-quiz",
+  "version": "1.0.0",
+  "description": "This is an application for playing a trivia quiz.",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "trivia",
+    "quiz"
+  ],
+  "author": "Aaron",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AaronArmour/trivia-quiz/issues"
+  },
+  "homepage": "https://github.com/AaronArmour/trivia-quiz#readme"
+}
