@@ -1,0 +1,13 @@
+{
+  "name": "@quiz-apps/server",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "The server application for the trivia quiz"
+}

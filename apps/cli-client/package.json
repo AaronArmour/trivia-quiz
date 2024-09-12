@@ -1,0 +1,13 @@
+{
+  "name": "@quiz-apps/cli-client",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "A cli client application for the trivia quiz"
+}
