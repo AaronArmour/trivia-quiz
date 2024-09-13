@@ -40,7 +40,6 @@ wss.on('connection', async (ws) => {
 
   players[playerId] = player;
 
-  // ws.playerId = playerId;
   console.log(`Player connected: ${playerId}`);
   players[playerId] = player;
 
