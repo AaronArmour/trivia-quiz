@@ -13,10 +13,10 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/core"
+      "path": "./packages/utils"
     },
     {
-      "path": "./packages/utils"
+      "path": "./packages/core"
     },
     {
       "path": "./apps/server"
