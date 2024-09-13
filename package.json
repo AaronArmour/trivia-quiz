@@ -9,7 +9,8 @@
   ],
   "main": "index.js",
   "scripts": {
-    "build": "tsc --build --verbose"
+    "build": "tsc --build --verbose",
+    "start-server": "node apps/server/build/index.js"
   },
   "keywords": [
     "trivia",
