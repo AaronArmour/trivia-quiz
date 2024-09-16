@@ -40,7 +40,9 @@ ws.on('message', async (message) => {
       console.log();
       break;
     case 'score':
+      // End of the quiz so display the final score and close the connection
       console.log(`You got ${mObj.correct} out of ${mObj.total} correct!`);
+      ws.close();
       break;
     default:
       console.log(`Unrecognised message type. Received response: ${message}`);
