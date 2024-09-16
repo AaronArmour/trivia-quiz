@@ -87,14 +87,14 @@ function prepareQuestions(questions: any[]): Question[] {
     const answers = new Array(choices.length);
     const perm = randomPermutation(choices.length);
     perm.forEach((p, i) => {
-      answers[p] = `${p}. ${choices[i]}`;
+      answers[p] = choices[i];
     });
 
     return {
       id: q.id,
       question: q.question,
       answers: answers,
-      correctAnswer: `${answers[perm[0]]}`,
+      correctAnswer: answers[perm[0]],
       correctResponse: `${perm[0]}`,
     };
   });

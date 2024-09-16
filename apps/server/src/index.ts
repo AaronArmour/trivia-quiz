@@ -17,17 +17,21 @@ wss.on('connection', async (ws) => {
     if (question) {
       ws.send(
         JSON.stringify({
+          mType: 'question',
           id: question.id,
           question: question.question,
           answers: question.answers,
         }),
       );
     } else {
-      ws.send('No more questions available');
+      ws.send(
+        JSON.stringify({
+          mType: 'text',
+          text: 'No more questions available',
+        }),
+      );
     }
   }
-
-  ws.send('Welcome to the WebSocket server!');
 
   const playerId = generateUniqueId('player');
   const player = {
@@ -58,14 +62,24 @@ wss.on('connection', async (ws) => {
     const obj = JSON.parse(message.toString('utf-8'));
 
     const grading = quiz.gradeAnswer(obj);
-    ws.send(JSON.stringify(grading));
+    ws.send(
+      JSON.stringify({
+        mType: 'grading',
+        ...grading,
+      }),
+    );
 
     if (quiz.numQuestionsLeft() > 0) {
       const question = quiz.getQuestion();
       sendQuestionToPlayer(question);
     } else {
       const score = quiz.getScore();
-      ws.send(`You got ${score.correct} out of ${score.total} correct!`);
+      ws.send(
+        JSON.stringify({
+          mType: 'score',
+          ...score,
+        }),
+      );
     }
   });
 
