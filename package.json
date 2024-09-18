@@ -10,7 +10,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc --build --verbose",
-    "start-server": "node apps/server/build/index.js"
+    "start-server": "node apps/server/build/index.js",
+    "start-cli-client": "node apps/cli-client/build/index.js"
   },
   "keywords": [
     "trivia",
