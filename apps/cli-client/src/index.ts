@@ -5,8 +5,9 @@ import kleur from 'kleur';
 import { Question } from '@quiz-lib/core';
 
 const PORT = Number(process.env.PORT) || 8081;
+const HOST = process.env.HOST || 'localhost';
 
-const ws = new WebSocket(`ws://localhost:${PORT}`);
+const ws = new WebSocket(`ws://${HOST}:${PORT}`);
 
 ws.on('open', () => {
   ws.send('Hello from client!');
