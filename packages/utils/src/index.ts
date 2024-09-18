@@ -1,6 +1,7 @@
-export function generateUniqueId(prefix: string): string {
+export function generateUniqueId(prefix?: string): string {
   const rand = Math.floor(Math.random() * 2 ** 48);
-  return `${prefix}_${rand.toString(36)}`;
+  const idString = rand.toString(36).padStart(10, '0');
+  return prefix ? `${prefix}_${idString}` : idString;
 }
 
 // Generate a random permutation using the Fisher-Yates/Knuth shuffle algorithm
