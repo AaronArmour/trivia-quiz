@@ -1,9 +1,11 @@
 import { WebSocketServer } from 'ws';
 
-import { generateUniqueId } from '@quiz-lib/utils';
+import { clamp, generateUniqueId } from '@quiz-lib/utils';
 import { Question, Quiz } from '@quiz-lib/core';
 
 const PORT = Number(process.env.PORT) || 8081;
+const MAX_QNS = 20; // Limit the number of questions to a maximum of 20
+const NUM_QNS = clamp(Number(process.env.NUM_QNS) || 10, 1, MAX_QNS); // ... and a minimum of 1
 
 // NB: host arg required to bind to all interfaces to allow Postman testing
 const wss = new WebSocketServer({ port: PORT, host: '0.0.0.0' });
@@ -51,7 +53,7 @@ wss.on('connection', async (ws) => {
     console.error('WebSocket Error: ', error);
   };
 
-  const quiz = new Quiz(ws);
+  const quiz = new Quiz(ws, NUM_QNS);
   await quiz.initQuestions();
 
   const question = quiz.getQuestion();
