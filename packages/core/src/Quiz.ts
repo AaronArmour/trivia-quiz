@@ -15,13 +15,15 @@ interface IQuiz {
 export class Quiz implements IQuiz {
   private id: string;
   private player: QuizPlayer;
+  private numQuestions: number;
   private qs: Question[];
   private qIndex: number;
   private correctAnswers: number;
 
-  constructor(player: QuizPlayer) {
+  constructor(player: QuizPlayer, numQuestions: number) {
     this.id = generateUniqueId('quiz');
     this.player = player;
+    this.numQuestions = numQuestions;
     this.qs = [];
     this.qIndex = 0;
     this.correctAnswers = 0;
@@ -29,7 +31,7 @@ export class Quiz implements IQuiz {
 
   async initQuestions(): Promise<void> {
     // fetch questions from API
-    this.qs = prepareQuestions(await getQuestions());
+    this.qs = prepareQuestions(await getQuestions(this.numQuestions));
   }
 
   getQuestion(): Question | undefined {
@@ -66,9 +68,9 @@ export class Quiz implements IQuiz {
 }
 
 // Eventually shift this to a separate file
-async function getQuestions() {
+async function getQuestions(numQuestions: number): Promise<any[]> {
   const res = await axios.get(
-    'https://the-trivia-api.com/v2/questions?limit=3',
+    `https://the-trivia-api.com/v2/questions?limit=${numQuestions}`,
   );
 
   return res.data.map((q: any) => {
