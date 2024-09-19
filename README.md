@@ -61,6 +61,8 @@ This will create a container named `server` attach it to the network `my_network
 
 You do not need to provide both the `--network` and `-p` options (but you can), which you might choose depends on where the server is hosted and how clients will connect.
 
+By default the server creates quizzes with 10 questions, this can be configured by setting the environment variable `NUM_QNS` using the `-e` flag. (Note that the number of questions is limited to 20 questions maximum.)
+
 #### Server logs
 
 You can follow the latest logs on the server with:
