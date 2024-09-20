@@ -9,10 +9,6 @@ const HOST = process.env.HOST || 'localhost';
 
 const ws = new WebSocket(`ws://${HOST}:${PORT}`);
 
-ws.on('open', () => {
-  ws.send('Hello from client!');
-});
-
 ws.on('message', async (message) => {
   const mObj = JSON.parse(message.toString('utf-8'));
 
@@ -41,14 +37,32 @@ ws.on('message', async (message) => {
       console.log();
       break;
     case 'score':
-      // End of the quiz so display the final score and close the connection
+      // End of the quiz, display the final score and prompt to play again
       console.log(`You got ${mObj.correct} out of ${mObj.total} correct!`);
-      ws.close();
+      if (
+        (await getYesNoResponse('Do you want to play another quiz?'))
+          .response === 'y'
+      ) {
+        ws.send(JSON.stringify({ mType: 'start' }));
+      } else {
+        ws.close();
+      }
+      break;
+    case 'new-game':
+      if ((await getYesNoResponse(mObj.text)).response === 'y') {
+        ws.send(JSON.stringify({ mType: 'start' }));
+      } else {
+        ws.close();
+      }
       break;
     default:
       console.log(`Unrecognised message type. Received response: ${message}`);
   }
 });
+
+ws.onerror = function (error) {
+  console.error('WebSocket Error: ', error);
+};
 
 async function getUserAnswer(question: Question) {
   return await prompt(
@@ -60,6 +74,25 @@ async function getUserAnswer(question: Question) {
         title: answer,
         value: i.toString(),
       })),
+    },
+    {
+      onCancel: () => {
+        process.exit(0);
+      },
+    },
+  );
+}
+
+async function getYesNoResponse(text: string) {
+  return await prompt(
+    {
+      type: 'select',
+      name: 'response',
+      message: text,
+      choices: [
+        { title: 'Yes', value: 'y' },
+        { title: 'No', value: 'n' },
+      ],
     },
     {
       onCancel: () => {
