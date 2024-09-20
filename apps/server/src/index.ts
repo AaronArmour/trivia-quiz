@@ -53,35 +53,47 @@ wss.on('connection', async (ws) => {
     console.error('WebSocket Error: ', error);
   };
 
-  const quiz = new Quiz(ws, NUM_QNS);
-  await quiz.initQuestions();
+  ws.send(
+    JSON.stringify({ mType: 'new-game', text: 'Do you want to play a quiz?' }),
+  );
+  let quiz: Quiz;
 
-  const question = quiz.getQuestion();
-  sendQuestionToPlayer(question);
-
-  ws.on('message', (message) => {
+  ws.on('message', async (message) => {
     console.log(`Received message from ${playerId}: ${message}`);
-    const obj = JSON.parse(message.toString('utf-8'));
+    const mObj = JSON.parse(message.toString('utf-8'));
 
-    const grading = quiz.gradeAnswer(obj);
-    ws.send(
-      JSON.stringify({
-        mType: 'grading',
-        ...grading,
-      }),
-    );
+    switch (mObj.mType) {
+      case 'answer':
+        const grading = quiz.gradeAnswer(mObj);
+        ws.send(
+          JSON.stringify({
+            mType: 'grading',
+            ...grading,
+          }),
+        );
 
-    if (quiz.numQuestionsLeft() > 0) {
-      const question = quiz.getQuestion();
-      sendQuestionToPlayer(question);
-    } else {
-      const score = quiz.getScore();
-      ws.send(
-        JSON.stringify({
-          mType: 'score',
-          ...score,
-        }),
-      );
+        if (quiz.numQuestionsLeft() > 0) {
+          const question = quiz.getQuestion();
+          sendQuestionToPlayer(question);
+        } else {
+          const score = quiz.getScore();
+          ws.send(
+            JSON.stringify({
+              mType: 'score',
+              ...score,
+            }),
+          );
+        }
+        break;
+      case 'start':
+        quiz = new Quiz(ws, NUM_QNS);
+        await quiz.initQuestions();
+
+        const question = quiz.getQuestion();
+        sendQuestionToPlayer(question);
+        break;
+      default:
+        console.log(`Unrecognised message type. Received response: ${message}`);
     }
   });
 
