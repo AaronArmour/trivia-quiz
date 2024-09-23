@@ -6,3 +6,6 @@ build/
 
 # Ignore TypeScript build info files
 *.tsbuildinfo
+
+# Ignore log files
+*.log
