@@ -65,6 +65,8 @@ By default the server creates quizzes with 10 questions, this can be configured 
 
 #### Server logs
 
+The log level is set to 'info' by default, but can be configured when starting the server using the `LOG_LEVEL` environment variable.
+
 You can follow the latest logs on the server with:
 
 ```bash
