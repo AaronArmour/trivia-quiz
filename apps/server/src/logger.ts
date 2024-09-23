@@ -6,11 +6,10 @@ const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 // Define a custom format for the log output with colors and labels
 const customFormat = printf(({ level, message, timestamp, ...meta }) => {
   const { playerId } = meta;
-  if (playerId) {
-    delete meta.playerId;
-  }
+  delete meta.playerId;
   const playerIdString = playerId ? `(${playerId}) ` : '';
   const metaString = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
+
   return `${timestamp} ${playerIdString}[${level}]: ${message}${metaString}`;
 });
 
