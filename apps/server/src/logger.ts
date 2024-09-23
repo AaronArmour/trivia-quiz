@@ -4,10 +4,14 @@ const { combine, timestamp, printf, colorize } = format;
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 
 // Define a custom format for the log output with colors and labels
-const customFormat = printf(({ level, message, timestamp, id, ...meta }) => {
-  const idString = id ? ` (${id})` : '';
+const customFormat = printf(({ level, message, timestamp, ...meta }) => {
+  const { playerId } = meta;
+  if (playerId) {
+    delete meta.playerId;
+  }
+  const playerIdString = playerId ? `(${playerId}) ` : '';
   const metaString = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
-  return `${timestamp} [${level}]${idString}: ${message}${metaString}`;
+  return `${timestamp} ${playerIdString}[${level}]: ${message}${metaString}`;
 });
 
 const logger = createLogger({
@@ -23,8 +27,13 @@ const logger = createLogger({
   ],
 });
 
-export function log(level: string, message: string, id?: string, meta = {}) {
-  logger.log(level, message, { id, ...meta });
+export function log(
+  level: string,
+  message: string,
+  playerId?: string,
+  meta = {},
+) {
+  logger.log(level, message, { playerId, ...meta });
 }
 
 log('info', `Configured with LOG_LEVEL=${LOG_LEVEL}`);
