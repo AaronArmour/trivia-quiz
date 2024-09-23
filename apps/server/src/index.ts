@@ -1,13 +1,17 @@
 import { WebSocketServer } from 'ws';
 
+import { NUM_QNS } from './constants';
 import { generateUniqueId } from '@quiz-lib/utils';
 import { messageHandler } from './messageHandler';
+import { log } from './logger';
+
+log('info', `Configured with NUM_QNS=${NUM_QNS}`);
 
 const PORT = Number(process.env.PORT) || 8081;
 
 // NB: host arg required to bind to all interfaces to allow Postman testing
 const wss = new WebSocketServer({ port: PORT, host: '0.0.0.0' });
-console.log(`WebSocket server listening on port: ${PORT}`);
+log('info', `WebSocket server listening on port: ${PORT}`);
 
 // ToDo: implement players and allow connections to be transient
 const players: { [k: string]: any } = {};
@@ -19,10 +23,10 @@ wss.on('connection', async (ws) => {
   };
 
   players[playerId] = player;
-  console.log(`Player connected: ${playerId}`);
+  log('info', 'Player connected', playerId);
 
   ws.onerror = function (error) {
-    console.error('WebSocket Error: ', error);
+    log('error', 'WebSocket Error', playerId, error);
   };
 
   ws.send(
@@ -35,7 +39,7 @@ wss.on('connection', async (ws) => {
   );
 
   ws.on('close', () => {
-    console.log(`Player disconnected: ${playerId}`);
+    log('info', 'Player disconnected', playerId);
     delete players[playerId];
   });
 });

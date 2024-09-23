@@ -4,19 +4,20 @@ import WebSocket from 'ws';
 import { NUM_QNS } from './constants';
 import { sendQuestionToPlayer } from './sendQuestion';
 import { Player } from './types';
+import { log } from './logger';
 
 export async function messageHandler(
   ws: WebSocket,
   message: WebSocket.RawData,
   player: Player,
 ) {
-  console.log(`Received message from ${player.id}: ${message}`);
+  log('verbose', `Received message: ${message}`, player.id);
   const mObj = JSON.parse(message.toString('utf-8'));
 
   switch (mObj.mType) {
     case 'answer':
       if (!player.quiz) {
-        console.log('Error: Player has no quiz object set');
+        log('warn', 'Player has no quiz object set', player.id);
         return;
       }
 
@@ -44,11 +45,12 @@ export async function messageHandler(
     case 'start':
       player.quiz = new Quiz(ws, NUM_QNS);
       await player.quiz.initQuestions();
+      log('info', 'Start quiz', player.id);
 
       const question = player.quiz.getQuestion();
       sendQuestionToPlayer(ws, question);
       break;
     default:
-      console.log(`Unrecognised message type. Received response: ${message}`);
+      log('warn', `Unrecognised message type: ${message}`, player.id);
   }
 }
