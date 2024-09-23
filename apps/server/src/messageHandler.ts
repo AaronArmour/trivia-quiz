@@ -11,8 +11,10 @@ export async function messageHandler(
   message: WebSocket.RawData,
   player: Player,
 ) {
-  log('verbose', `Received message: ${message}`, player.id);
+  log('debug', `Received message: ${message}`, player.id);
+
   const mObj = JSON.parse(message.toString('utf-8'));
+  log('verbose', `Received message of type: ${mObj.mType}`, player.id);
 
   switch (mObj.mType) {
     case 'answer':
@@ -21,7 +23,9 @@ export async function messageHandler(
         return;
       }
 
+      log('verbose', 'Grading answer', player.id);
       const grading = player.quiz.gradeAnswer(mObj);
+      log('debug', `Graded answer as follows:`, player.id, grading);
       ws.send(
         JSON.stringify({
           mType: 'grading',
@@ -30,10 +34,14 @@ export async function messageHandler(
       );
 
       if (player.quiz.numQuestionsLeft() > 0) {
+        log('verbose', 'Sending next question', player.id);
         const question = player.quiz.getQuestion();
+        log('debug', `Next question is:`, player.id, question);
         sendQuestionToPlayer(ws, question);
       } else {
+        log('info', 'Quiz complete', player.id);
         const score = player.quiz.getScore();
+        log('debug', `Player score is:`, player.id, score);
         ws.send(
           JSON.stringify({
             mType: 'score',
@@ -43,11 +51,15 @@ export async function messageHandler(
       }
       break;
     case 'start':
+      log('verbose', 'Creating new quiz', player.id);
       player.quiz = new Quiz(ws, NUM_QNS);
       await player.quiz.initQuestions();
+      log('debug', 'Quiz questions initialised', player.id);
       log('info', 'Start quiz', player.id);
 
       const question = player.quiz.getQuestion();
+      log('verbose', 'Sending first question', player.id);
+      log('debug', `First question is:`, player.id, question);
       sendQuestionToPlayer(ws, question);
       break;
     default:
