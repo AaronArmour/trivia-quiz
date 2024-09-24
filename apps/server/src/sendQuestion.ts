@@ -1,23 +1,19 @@
-import { WebSocket } from 'ws';
+import { Socket } from 'socket.io';
 
 import { Question } from '@quiz-lib/core';
 
-export function sendQuestionToPlayer(ws: WebSocket, question?: Question) {
+export function sendQuestionToPlayer(socket: Socket, question?: Question) {
   if (question) {
-    ws.send(
-      JSON.stringify({
-        mType: 'question',
-        id: question.id,
-        question: question.question,
-        answers: question.answers,
-      }),
-    );
+    socket.emit('message', {
+      mType: 'question',
+      id: question.id,
+      question: question.question,
+      answers: question.answers,
+    });
   } else {
-    ws.send(
-      JSON.stringify({
-        mType: 'text',
-        text: 'No more questions available',
-      }),
-    );
+    socket.emit('message', {
+      mType: 'text',
+      text: 'No more questions available',
+    });
   }
 }
