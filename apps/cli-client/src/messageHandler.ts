@@ -1,57 +1,52 @@
-import WebSocket from 'ws';
+import { Socket } from 'socket.io-client';
 import kleur from 'kleur';
 
 import { getUserAnswer, getYesNoResponse } from './userInput';
 
-export async function messageHandler(
-  ws: WebSocket,
-  message: WebSocket.RawData,
-) {
-  const mObj = JSON.parse(message.toString('utf-8'));
-
-  switch (mObj.mType) {
+export async function messageHandler(socket: Socket, message: any) {
+  switch (message.mType) {
     case 'text':
-      console.log(mObj.text);
+      console.log(message.text);
       break;
     case 'question':
-      const userAnswer = await getUserAnswer(mObj);
+      const userAnswer = await getUserAnswer(message);
 
-      ws.send(
-        JSON.stringify({
-          mType: 'answer',
-          id: mObj.id,
-          answer: userAnswer,
-        }),
-      );
+      socket.emit('message', {
+        mType: 'answer',
+        id: message.id,
+        answer: userAnswer,
+      });
       break;
     case 'grading':
-      if (mObj.correct) {
+      if (message.correct) {
         console.log(kleur.green('Correct!'));
       } else {
         console.log(kleur.red('Incorrect!'));
-        console.log(kleur.red(`Correct answer: ${mObj.correctAnswer}`));
+        console.log(kleur.red(`Correct answer: ${message.correctAnswer}`));
       }
       console.log();
       break;
     case 'score':
       // End of the quiz, display the final score and prompt to play again
-      console.log(`You got ${mObj.correct} out of ${mObj.total} correct!`);
+      console.log(
+        `You got ${message.correct} out of ${message.total} correct!`,
+      );
       if (
         (await getYesNoResponse('Do you want to play another quiz?')) === 'y'
       ) {
-        ws.send(JSON.stringify({ mType: 'start' }));
+        socket.emit('message', { mType: 'start' });
       } else {
-        ws.close();
+        socket.disconnect();
       }
       break;
     case 'new-game':
-      if ((await getYesNoResponse(mObj.text)) === 'y') {
-        ws.send(JSON.stringify({ mType: 'start' }));
+      if ((await getYesNoResponse(message.text)) === 'y') {
+        socket.emit('message', { mType: 'start' });
       } else {
-        ws.close();
+        socket.disconnect();
       }
       break;
     default:
-      console.log(`Unrecognised message type. Received response: ${message}`);
+      console.log(`Unrecognized message type. Received response: ${message}`);
   }
 }

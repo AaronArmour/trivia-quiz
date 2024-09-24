@@ -1,4 +1,5 @@
-import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 import { NUM_QNS } from './constants';
 import { generateUniqueId } from '@quiz-lib/utils';
@@ -9,14 +10,13 @@ log('info', `Configured with NUM_QNS=${NUM_QNS}`);
 
 const PORT = Number(process.env.PORT) || 8081;
 
-// NB: host arg required to bind to all interfaces to allow Postman testing
-const wss = new WebSocketServer({ port: PORT, host: '0.0.0.0' });
-log('info', `WebSocket server listening on port: ${PORT}`);
+const httpServer = createServer();
+const io = new Server(httpServer);
 
 // ToDo: implement players and allow connections to be transient
 const players: { [k: string]: any } = {};
 
-wss.on('connection', async (ws) => {
+io.on('connection', (socket) => {
   const playerId = generateUniqueId('player');
   const player = {
     id: playerId,
@@ -25,21 +25,29 @@ wss.on('connection', async (ws) => {
   players[playerId] = player;
   log('info', 'Player connected', playerId);
 
-  ws.onerror = function (error) {
-    log('error', 'WebSocket Error', playerId, error);
-  };
+  socket.onAny((event, ...args) => {
+    log('debug', `Received socket '${event}' event:`, playerId, args);
+  });
 
-  ws.send(
-    JSON.stringify({ mType: 'new-game', text: 'Do you want to play a quiz?' }),
-  );
+  socket.on('error', (error) => {
+    log('error', 'Socket.IO Error', playerId, error);
+  });
 
-  ws.on(
-    'message',
-    async (message) => await messageHandler(ws, message, player),
-  );
+  socket.on('message', async (message) => {
+    await messageHandler(socket, message, player);
+  });
 
-  ws.on('close', () => {
+  socket.on('disconnect', () => {
     log('info', 'Player disconnected', playerId);
     delete players[playerId];
   });
+
+  socket.emit('message', {
+    mType: 'new-game',
+    text: 'Do you want to play a quiz?',
+  });
+});
+
+httpServer.listen(PORT, '0.0.0.0', () => {
+  log('info', `Socket.IO server listening on port: ${PORT}`);
 });

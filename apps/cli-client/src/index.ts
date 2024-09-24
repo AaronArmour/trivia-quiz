@@ -1,13 +1,18 @@
-import { WebSocket } from 'ws';
+import { io, Socket } from 'socket.io-client';
 import { messageHandler } from './messageHandler';
 
 const PORT = Number(process.env.PORT) || 8081;
 const HOST = process.env.HOST || 'localhost';
 
-const ws = new WebSocket(`ws://${HOST}:${PORT}`);
+const socket: Socket = io(`http://${HOST}:${PORT}`);
 
-ws.on('message', async (message) => await messageHandler(ws, message));
+// Handle incoming messages from the server
+socket.on(
+  'message',
+  async (message: any) => await messageHandler(socket, message),
+);
 
-ws.onerror = function (error) {
-  console.error('WebSocket Error: ', error);
-};
+// Error handling
+socket.on('connect_error', (error) => {
+  console.error('Socket.IO Connection Error: ', error);
+});
