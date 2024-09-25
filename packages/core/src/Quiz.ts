@@ -8,6 +8,13 @@ export interface Player {
   quiz?: Quiz;
 }
 
+export function assertNever(message: never, player?: Player): never {
+  if (player) {
+    throw new Error(`Unrecognised message ${message} for player ${player.id}`);
+  }
+  throw new Error(`Unrecognised message ${message}`);
+}
+
 interface IQuiz {
   initQuestions(): Promise<void>;
   getQuestion(): Question | undefined;
