@@ -5,6 +5,7 @@ import { NUM_QNS } from './constants';
 import { generateUniqueId } from '@quiz-lib/utils';
 import { messageHandler } from './messageHandler';
 import { log } from './logger';
+import { ServerMessageType } from '@quiz-lib/core';
 
 log('info', `Configured with NUM_QNS=${NUM_QNS}`);
 
@@ -34,7 +35,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', async (message) => {
-    await messageHandler(socket, message, player);
+    await messageHandler(socket, player, message);
   });
 
   socket.on('disconnect', () => {
@@ -43,8 +44,10 @@ io.on('connection', (socket) => {
   });
 
   socket.emit('message', {
-    mType: 'new-game',
-    text: 'Do you want to play a quiz?',
+    type: ServerMessageType.NEW_GAME,
+    payload: {
+      text: 'Do you want to play a quiz?',
+    },
   });
 });
 
