@@ -3,7 +3,7 @@ import { Socket } from 'socket.io';
 
 import { NUM_QNS } from './constants';
 import { sendQuestionToPlayer } from './sendQuestion';
-import { Player } from './types';
+import { Player } from '@quiz-lib/core';
 import { log } from './logger';
 
 export async function messageHandler(
