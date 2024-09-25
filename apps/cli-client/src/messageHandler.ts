@@ -2,51 +2,66 @@ import { Socket } from 'socket.io-client';
 import kleur from 'kleur';
 
 import { getUserAnswer, getYesNoResponse } from './userInput';
+import {
+  assertNever,
+  ClientMessageType,
+  ServerMessage,
+  ServerMessageType,
+} from '@quiz-lib/core';
 
-export async function messageHandler(socket: Socket, message: any) {
-  switch (message.mType) {
-    case 'text':
-      console.log(message.text);
+export async function messageHandler(socket: Socket, message: ServerMessage) {
+  switch (message.type) {
+    case ServerMessageType.TEXT:
+      console.log(message.payload.text);
       break;
-    case 'question':
-      const userAnswer = await getUserAnswer(message);
+
+    case ServerMessageType.QUESTION:
+      const userAnswer = await getUserAnswer(message.payload);
 
       socket.emit('message', {
-        mType: 'answer',
-        id: message.id,
-        answer: userAnswer,
+        type: ClientMessageType.ANSWER,
+        payload: {
+          id: message.payload.id,
+          answer: userAnswer,
+        },
       });
       break;
-    case 'grading':
-      if (message.correct) {
+
+    case ServerMessageType.GRADING:
+      if (message.payload.correct) {
         console.log(kleur.green('Correct!'));
       } else {
         console.log(kleur.red('Incorrect!'));
-        console.log(kleur.red(`Correct answer: ${message.correctAnswer}`));
+        console.log(
+          kleur.red(`Correct answer: ${message.payload.correctAnswer}`),
+        );
       }
       console.log();
       break;
-    case 'score':
+
+    case ServerMessageType.SCORE:
       // End of the quiz, display the final score and prompt to play again
       console.log(
-        `You got ${message.correct} out of ${message.total} correct!`,
+        `You got ${message.payload.correct} out of ${message.payload.total} correct!`,
       );
       if (
         (await getYesNoResponse('Do you want to play another quiz?')) === 'y'
       ) {
-        socket.emit('message', { mType: 'start' });
+        socket.emit('message', { type: ClientMessageType.START, payload: {} });
       } else {
         socket.disconnect();
       }
       break;
-    case 'new-game':
-      if ((await getYesNoResponse(message.text)) === 'y') {
-        socket.emit('message', { mType: 'start' });
+
+    case ServerMessageType.NEW_GAME:
+      if ((await getYesNoResponse(message.payload.text)) === 'y') {
+        socket.emit('message', { type: ClientMessageType.START, payload: {} });
       } else {
         socket.disconnect();
       }
       break;
+
     default:
-      console.log(`Unrecognized message type. Received response: ${message}`);
+      assertNever(message);
   }
 }

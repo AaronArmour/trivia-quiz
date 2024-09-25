@@ -2,7 +2,18 @@ import axios from 'axios';
 
 import { generateUniqueId, randomPermutation } from '@quiz-lib/utils';
 import { Answer, Question, QuestionGrading, Score } from './types';
-import { QuizPlayer } from './QuizPlayer';
+
+export interface Player {
+  id: string;
+  quiz?: Quiz;
+}
+
+export function assertNever(message: never, player?: Player): never {
+  if (player) {
+    throw new Error(`Unrecognised message ${message} for player ${player.id}`);
+  }
+  throw new Error(`Unrecognised message ${message}`);
+}
 
 interface IQuiz {
   initQuestions(): Promise<void>;
@@ -14,13 +25,13 @@ interface IQuiz {
 
 export class Quiz implements IQuiz {
   private id: string;
-  private player: QuizPlayer;
+  private player: Player;
   private numQuestions: number;
   private qs: Question[];
   private qIndex: number;
   private correctAnswers: number;
 
-  constructor(player: QuizPlayer, numQuestions: number) {
+  constructor(player: Player, numQuestions: number) {
     this.id = generateUniqueId('quiz');
     this.player = player;
     this.numQuestions = numQuestions;
