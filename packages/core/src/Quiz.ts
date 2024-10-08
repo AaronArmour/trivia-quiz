@@ -1,11 +1,20 @@
 import axios from 'axios';
 
 import { generateUniqueId, randomPermutation } from '@quiz-lib/utils';
-import { Answer, Question, QuestionGrading, Score } from './types';
+import {
+  Answer,
+  Question,
+  QuestionGrading,
+  Score,
+  ServerMessage,
+} from './types';
+import { Socket } from 'socket.io';
 
 export interface Player {
   id: string;
   quiz?: Quiz;
+  socket: Socket;
+  emit(message: ServerMessage): void;
 }
 
 export function assertNever(message: never, player?: Player): never {
@@ -25,19 +34,24 @@ interface IQuiz {
 
 export class Quiz implements IQuiz {
   private id: string;
-  private player: Player;
   private numQuestions: number;
   private qs: Question[];
   private qIndex: number;
   private correctAnswers: number;
 
-  constructor(player: Player, numQuestions: number) {
+  constructor(numQuestions: number) {
     this.id = generateUniqueId('quiz');
-    this.player = player;
     this.numQuestions = numQuestions;
     this.qs = [];
     this.qIndex = 0;
     this.correctAnswers = 0;
+  }
+
+  toJSON(): object {
+    return {
+      type: 'Quiz',
+      id: this.id,
+    };
   }
 
   async initQuestions(): Promise<void> {

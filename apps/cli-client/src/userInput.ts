@@ -1,8 +1,8 @@
 import { prompt } from 'prompts';
 
-import { Question } from '@quiz-lib/core';
+import { QuestionPayload } from '@quiz-lib/core';
 
-export async function getUserAnswer(question: Question) {
+export async function getUserAnswer(question: QuestionPayload) {
   return (
     await prompt(
       {

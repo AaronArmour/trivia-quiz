@@ -11,11 +11,7 @@ import { sendQuestionToPlayer } from './sendQuestion';
 import { ClientMessageType, Player } from '@quiz-lib/core';
 import { log } from './logger';
 
-export async function messageHandler(
-  socket: Socket,
-  player: Player,
-  message: ClientMessage,
-) {
+export async function messageHandler(player: Player, message: ClientMessage) {
   log('verbose', `Received message of type: ${message.type}`, player.id);
 
   switch (message.type) {
@@ -28,7 +24,7 @@ export async function messageHandler(
       log('verbose', 'Grading answer', player.id);
       const grading = player.quiz.gradeAnswer(message.payload);
       log('debug', `Graded answer as follows:`, player.id, grading);
-      socket.emit('message', {
+      player.emit({
         type: ServerMessageType.GRADING,
         payload: grading,
       });
@@ -37,12 +33,12 @@ export async function messageHandler(
         log('verbose', 'Sending next question', player.id);
         const question = player.quiz.getQuestion();
         log('debug', `Next question is:`, player.id, question);
-        sendQuestionToPlayer(socket, question);
+        sendQuestionToPlayer(player, question);
       } else {
         log('info', 'Quiz complete', player.id);
         const score = player.quiz.getScore();
         log('debug', `Player score is:`, player.id, score);
-        socket.emit('message', {
+        player.emit({
           type: ServerMessageType.SCORE,
           payload: score,
         });
@@ -51,7 +47,7 @@ export async function messageHandler(
 
     case ClientMessageType.START:
       log('verbose', 'Creating new quiz', player.id);
-      player.quiz = new Quiz(socket, NUM_QNS);
+      player.quiz = new Quiz(NUM_QNS);
       await player.quiz.initQuestions();
       log('debug', 'Quiz questions initialised', player.id);
       log('info', 'Start quiz', player.id);
@@ -59,7 +55,7 @@ export async function messageHandler(
       const question = player.quiz.getQuestion();
       log('verbose', 'Sending first question', player.id);
       log('debug', `First question is:`, player.id, question);
-      sendQuestionToPlayer(socket, question);
+      sendQuestionToPlayer(player, question);
       break;
 
     default:

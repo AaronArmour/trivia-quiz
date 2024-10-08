@@ -1,10 +1,8 @@
-import { Socket } from 'socket.io';
+import { Player, Question, ServerMessageType } from '@quiz-lib/core';
 
-import { Question, ServerMessageType } from '@quiz-lib/core';
-
-export function sendQuestionToPlayer(socket: Socket, question?: Question) {
+export function sendQuestionToPlayer(player: Player, question?: Question) {
   if (question) {
-    socket.emit('message', {
+    player.emit({
       type: ServerMessageType.QUESTION,
       payload: {
         id: question.id,
@@ -13,7 +11,7 @@ export function sendQuestionToPlayer(socket: Socket, question?: Question) {
       },
     });
   } else {
-    socket.emit('message', {
+    player.emit({
       type: ServerMessageType.TEXT,
       payload: {
         text: 'No more questions available',
