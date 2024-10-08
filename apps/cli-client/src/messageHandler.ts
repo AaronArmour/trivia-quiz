@@ -9,7 +9,15 @@ import {
   ServerMessageType,
 } from '@quiz-lib/core';
 
-export async function messageHandler(socket: Socket, message: ServerMessage) {
+export interface ClientState {
+  quit: boolean;
+}
+
+export async function messageHandler(
+  socket: Socket,
+  message: ServerMessage,
+  state: ClientState,
+) {
   switch (message.type) {
     case ServerMessageType.TEXT:
       console.log(message.payload.text);
@@ -28,6 +36,8 @@ export async function messageHandler(socket: Socket, message: ServerMessage) {
       break;
 
     case ServerMessageType.GRADING:
+      if (!message.payload) return;
+
       if (message.payload.correct) {
         console.log(kleur.green('Correct!'));
       } else {
@@ -49,7 +59,9 @@ export async function messageHandler(socket: Socket, message: ServerMessage) {
       ) {
         socket.emit('message', { type: ClientMessageType.START, payload: {} });
       } else {
+        state.quit = true;
         socket.disconnect();
+        process.exit(0);
       }
       break;
 
@@ -57,7 +69,9 @@ export async function messageHandler(socket: Socket, message: ServerMessage) {
       if ((await getYesNoResponse(message.payload.text)) === 'y') {
         socket.emit('message', { type: ClientMessageType.START, payload: {} });
       } else {
+        state.quit = true;
         socket.disconnect();
+        process.exit(0);
       }
       break;
 
