@@ -11,6 +11,7 @@
   "description": "The package containing core functionality for the quiz library",
   "dependencies": {
     "@quiz-lib/utils": "^1.0.0",
-    "axios": "^1.7.7"
+    "axios": "^1.7.7",
+    "socket.io": "^4.8.0"
   }
 }

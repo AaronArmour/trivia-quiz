@@ -6,6 +6,12 @@ export interface Question {
   correctResponse: string;
 }
 
+export interface QuestionPayload {
+  id: string;
+  question: string;
+  answers: string[];
+}
+
 export interface Answer {
   id: string;
   answer: string;
@@ -54,12 +60,12 @@ export interface NewGameMessage {
 
 export interface QuestionMessage {
   type: ServerMessageType.QUESTION;
-  payload: Question;
+  payload: QuestionPayload;
 }
 
 export interface GradingMessage {
   type: ServerMessageType.GRADING;
-  payload: QuestionGrading;
+  payload: QuestionGrading | undefined;
 }
 
 export interface ScoreMessage {
